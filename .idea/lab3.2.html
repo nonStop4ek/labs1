@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Гра "Влучи в область"</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    canvas {
+      border: 1px solid black;
+      margin-top: 20px;
+    }
+
+    .input-section {
+      margin-top: 20px;
+    }
+
+    .history {
+      margin-top: 20px;
+    }
+
+    .hint {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Влучи в область на площині</h1>
+
+<canvas id="myCanvas" width="500" height="500"></canvas>
+
+<div class="input-section">
+  <label for="x">X:</label>
+  <input type="number" id="x" name="x" required>
+  <label for="y">Y:</label>
+  <input type="number" id="y" name="y" required>
+  <button onclick="checkHit()">Введіть координати</button>
+</div>
+
+<div class="history">
+  <h3>Історія спроб:</h3>
+  <ul id="historyList"></ul>
+</div>
+
+<p id="hint" class="hint"></p>
+
+<script>
+  // Отримуємо канвас і його контекст
+  var canvas = document.getElementById('myCanvas');
+  var ctx = canvas.getContext('2d');
+
+  // Початкові координати для цілі
+  var targetX = 250;
+  var targetY = 250;
+
+  // Малюємо області
+  function drawShapes() {
+    // Малюємо вертикальну стрічку
+    ctx.fillStyle = 'blue';
+    ctx.fillRect(100, 100, 50, 300);  // Від (100, 100) до (150, 400)
+
+    // Малюємо прямокутник
+    ctx.fillStyle = 'green';
+    ctx.fillRect(200, 200, 100, 100);  // Від (200, 200) до (300, 300)
+
+    // Малюємо горизонтальну стрічку
+    ctx.fillStyle = 'red';
+    ctx.fillRect(150, 150, 200, 50);  // Від (150, 150) до (350, 200)
+  }
+
+  // Перевірка влучення
+  function checkHit() {
+    var x = parseInt(document.getElementById('x').value);
+    var y = parseInt(document.getElementById('y').value);
+
+    // Перевірка на правильність вводу
+    if (isNaN(x) || isNaN(y)) {
+      alert("Введіть коректні координати!");
+      return;
+    }
+
+    var distance = Math.sqrt(Math.pow(x - targetX, 2) + Math.pow(y - targetY, 2));
+
+    // Малюємо точку
+    ctx.fillStyle = 'black';
+    ctx.beginPath();
+    ctx.arc(x, y, 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Додаємо в історію спроб
+    var historyList = document.getElementById('historyList');
+    var listItem = document.createElement('li');
+    listItem.textContent = `X: ${x}, Y: ${y}`;
+    historyList.appendChild(listItem);
+
+    // Підказки
+    if (distance < 50) {
+      document.getElementById('hint').textContent = 'Тепліше!';
+    } else {
+      document.getElementById('hint').textContent = 'Холодніше!';
+    }
+
+    // Перевірка на влучення
+    if (distance < 10) {
+      alert('Нарешті ви влучили!');
+      drawShapes();  // Перемалюємо області після влучення
+      document.getElementById('hint').textContent = ''; // Очищаємо підказку
+    }
+  }
+
+  // Малюємо області при завантаженні сторінки
+  drawShapes();
+</script>
+
+</body>
+</html>
+

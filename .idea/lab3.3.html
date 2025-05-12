@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Сортування SSORT</title>
+  <style>
+    /* Основні стилі для body */
+    body {
+      font-family: Arial, sans-serif; /* Вибір шрифту */
+      margin: 20px; /* Відступи по краях */
+      line-height: 1.6; /* Міжрядковий інтервал */
+    }
+
+    /* Заголовки */
+    h1, h3 {
+      color: #333; /* Колір заголовків */
+    }
+
+    /* Стилі для текстових міток */
+    label {
+      margin-right: 10px; /* Відступ між міткою і елементом форми */
+      font-weight: bold; /* Жирний шрифт для міток */
+    }
+
+    /* Поля введення */
+    input[type="file"],
+    input[type="text"] {
+      margin-bottom: 10px; /* Відступ знизу */
+    }
+
+    /* Стилі для кнопок */
+    button {
+      padding: 8px 15px; /* Внутрішні відступи */
+      background-color: #4CAF50; /* Основний зелений фон */
+      color: white; /* Колір тексту */
+      border: none; /* Відсутність рамки */
+      cursor: pointer; /* Індикатор натискання */
+    }
+
+    /* Зміна кольору кнопки при наведенні */
+    button:hover {
+      background-color: #45a049; /* Трохи темніший відтінок */
+    }
+
+    /* Оформлення блоку коду */
+    pre {
+      background-color: #f4f4f4; /* Світло-сірий фон */
+      padding: 10px; /* Внутрішні відступи */
+      border: 1px solid #ddd; /* Тонка рамка */
+    }
+
+  </style>
+</head>
+<body>
+<h1>Сортування послідовності методом SSORT</h1>
+
+<!-- Завантаження вхідного файлу -->
+<div>
+  <label for="inputFile">Виберіть вхідний файл:</label>
+  <input type="file" id="inputFile" accept=".txt">
+</div>
+
+<!-- Відображення початкової послідовності -->
+<div id="originalSequenceContainer">
+  <h3>Початкова послідовність:</h3>
+  <pre id="originalSequence"></pre>
+</div>
+
+<!-- Кнопка для запуску сортування -->
+<button id="sortButton">Відсортувати</button>
+
+<!-- Відображення відсортованої послідовності -->
+<div id="sortedSequenceContainer">
+  <h3>Відсортована послідовність:</h3>
+  <pre id="sortedSequence"></pre>
+</div>
+
+<!-- Кнопка для збереження результату у файл -->
+<div>
+  <label for="outputFileName">Ім'я файлу для результату:</label>
+  <input type="text" id="outputFileName" placeholder="result.txt">
+  <button id="saveButton">Зберегти результат</button>
+</div>
+
+<script>
+  document.getElementById("inputFile").addEventListener("change", readInputFile);
+  document.getElementById("sortButton").addEventListener("click", sortSequence);
+  document.getElementById("saveButton").addEventListener("click", saveToFile);
+
+  let sequence = [];
+
+  // Читання вхідного файлу
+  function readInputFile(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = function () {
+      sequence = reader.result.trim().split(/\s+/).map(Number);
+      document.getElementById("originalSequence").textContent = sequence.join(", ");
+    };
+    reader.readAsText(file);
+  }
+
+  // Сортування методом SSORT (за мінімальним значенням, на яке ділиться число)
+  function sortSequence() {
+    if (sequence.length === 0) {
+      alert("Спочатку завантажте файл!");
+      return;
+    }
+
+    sequence.sort((a, b) => findMinDivisor(a) - findMinDivisor(b));
+    document.getElementById("sortedSequence").textContent = sequence.join(", ");
+  }
+
+  // Функція пошуку мінімального дільника
+  function findMinDivisor(num) {
+    for (let i = 2; i <= Math.abs(num); i++) {
+      if (num % i === 0) return i;
+    }
+    return Math.abs(num); // Якщо число просте
+  }
+
+  // Збереження результату у файл
+  function saveToFile() {
+    const fileName = document.getElementById("outputFileName").value || "result.txt";
+    const blob = new Blob([sequence.join(" ")], { type: "text/plain" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    link.click();
+  }
+</script>
+</body>
+</html>

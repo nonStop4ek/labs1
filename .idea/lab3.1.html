@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Перестановка значень</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .variable {
+            padding: 10px 20px;
+            border: 2px solid #4CAF50;
+            cursor: pointer;
+            font-size: 20px;
+            user-select: none;
+        }
+        .selected {
+            background-color: #4CAF50;
+            color: white;
+        }
+        #swap-paragraph {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #008CBA;
+            color: white;
+            cursor: pointer;
+            display: inline-block;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        #swap-paragraph.disabled {
+            background-color: gray;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+<h1>Перестановка значень: Варіант CADEB</h1>
+<p>Натисніть на два значення для перестановки, а потім на параграф "Обміняти".</p>
+
+<!-- Контейнер для змінних -->
+<div class="container" id="variables-container">
+    <div class="variable" data-index="0">A</div>
+    <div class="variable" data-index="1">B</div>
+    <div class="variable" data-index="2">C</div>
+    <div class="variable" data-index="3">D</div>
+    <div class="variable" data-index="4">E</div>
+</div>
+
+<!-- Параграф для свопу -->
+<p id="swap-paragraph" class="disabled">Обміняти</p>
+
+<!-- Відображення результату -->
+<h2>Поточний порядок:</h2>
+<p id="result">A, B, C, D, E</p>
+
+<script>
+    // Масив значень та змінних
+    let variables = ['A', 'B', 'C', 'D', 'E'];
+    const elements = document.querySelectorAll('.variable');
+    const swapParagraph = document.getElementById('swap-paragraph');
+    const result = document.getElementById('result');
+
+    let selectedIndices = [];
+
+    // Додаємо обробник подій для кожного елемента
+    elements.forEach((el, index) => {
+        el.addEventListener('click', () => selectElement(index, el));
+    });
+
+    // Обробка вибору елементів
+    function selectElement(index, el) {
+        if (selectedIndices.includes(index)) {
+            // Скасовуємо вибір, якщо елемент вже вибрано
+            selectedIndices = selectedIndices.filter(i => i !== index);
+            el.classList.remove('selected');
+        } else if (selectedIndices.length < 2) {
+            // Додаємо вибір, якщо обрано менше 2 елементів
+            selectedIndices.push(index);
+            el.classList.add('selected');
+        }
+
+        // Вмикаємо або вимикаємо параграф
+        swapParagraph.classList.toggle('disabled', selectedIndices.length !== 2);
+    }
+
+    // Обробка обміну значень
+    swapParagraph.addEventListener('click', () => {
+        if (selectedIndices.length === 2) {
+            // Виконуємо обмін значень у масиві
+            const [i, j] = selectedIndices;
+            [variables[i], variables[j]] = [variables[j], variables[i]];
+
+            // Оновлюємо відображення
+            updateDisplay();
+
+            // Скидаємо вибір
+            selectedIndices = [];
+            elements.forEach(el => el.classList.remove('selected'));
+            swapParagraph.classList.add('disabled');
+        }
+    });
+
+    // Оновлення відображення значень
+    function updateDisplay() {
+        elements.forEach((el, index) => {
+            el.textContent = variables[index];
+        });
+        result.textContent = variables.join(', ');
+    }
+</script>
+</body>
+</html>
